@@ -28,3 +28,12 @@ func checkLink(link string) {
 
 	fmt.Println(link, "is up!")
 }
+
+// Notes:
+// 1. How our code is being executed right now:
+//    With our slice of links -> Take first link from slice -> Make request -> GET http://google.com -> Wait for a response, log it
+//							  -> Take next link, make request -> GET http://facebook.com -> Wait for a response, log it
+//							  -> Repeat for others
+//
+//    Basically it's in series, every single time we're making a request, We sit around and wait for the response to come back before making the next
+//    So our aim to to make requests in parallel
