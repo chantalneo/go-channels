@@ -15,7 +15,7 @@ func main() {
 	}
 
 	for _, link := range links {
-		checkLink(link)
+		go checkLink(link)
 	}
 }
 
@@ -116,3 +116,40 @@ func checkLink(link string) {
 //    Child Go routine  ---/
 //
 //    Child routines are not quite given the same level of respect, I guess for lack of a better term, we'll say respect as the main routine is.
+//    If the lifespan of the main routine is shorter than our Child Go routine, the entire program quits automatically! In our case, nothing
+//    got printed out...
+//
+//    To address that issue, we need to use a channel to make sure that the main routine is aware of when each of these child go routines have
+//    completed their code. So essentially we're going to create one channel and that channel is going to communicate between all of these different
+//    routines and channels are the only way that we have to communicate between go routines. There's no other way.
+//
+//                         Child go routine
+//
+//                      (bi-directional arrow)
+//
+//   Main Routine     <->     Channel     <->      Child go routine
+//
+//                      (bi-directional arrow)
+//
+//                         Child go routine
+//
+//    We only communicate using channels, so we can kind of think of a channel as being something like the above. That kind of intermediates discussion or communication between all these different
+//    running routines on our local machine. You can think of the channel itself as being like text messaging or like instant messaging. So we can send some data into a channel and that will
+//    automatically get sent to any other running routine on a machine that has access to that channel. We can treat a channel just like any other value inside of go. So we create a channel
+//    essentially in the same way that we create a struct or a slice or an int or a string. So there are actual values that we can pass around and in this case we'll pass around to these different
+//    Go routines.
+//
+//    Now the most important thing to understand about channels is that they are typed just like every other variable.
+//    So instructor isn't just saying the fact that hey this value is of type channel. He meant to say that the information that we pass into a channel or the data that we attempt to share
+//    between these different routines must all be of the same type. So essentially when we create a channel we say make a channel that is meant for sharing say type String (can be other, too)
+//    throughout our application, so we will make a channel of type string.
+//
+//       Go Routine
+//           / \
+//            |   "asdf"
+//            v
+//  Channel of type String
+//           / \
+//            |   "asdf"
+//            V
+//       Go Routine
