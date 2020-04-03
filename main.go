@@ -203,3 +203,80 @@ func checkLink(link string, c chan string) {
 //
 //     Remember the big takeaway with routines that we just learned right here is that we should never ever try to access the same variable from a different child routine where ever possible.
 //     We only share information with a child routine or a new routine that we create by passing it in as an argument or communicating with the child routine over channels.
+
+// Quiz 11: Channels and Go Routines
+// 1. Go Routines and Channels are tough, so let's start with the basics! Which of the following best describes what a go routine is? A separate line of code execution that can be used to handle blocking code
+// 2. What is the purpose of a channel? For communication between go routines
+// 3. Take a look at the following program. Are there any issues with it? Both answers #2 and #3 are correct:
+//    2 - The greeting variable is referenced directly in the go routine, which might lead to issues if we eventually start to change the value of greeting
+//    3 - The program will likely exit before the fmt.Println function has an opportunity to actually print anything out to the terminal; this might not be the intent of the program
+/* 	package main
+
+	import (
+		"fmt"
+	)
+
+	func main() {
+ 		greeting := "Hi There!"
+
+ 		go (func() {
+     		fmt.Println(greeting)
+ 		})()
+	} */
+// 4. Here's a tough one - Is there any issue with the following code? The channel is expecting values of type string, but we're passing in a value of type byte slice, which is technically not a string
+/* 	package main
+
+	func main() {
+ 		c := make(chan string)
+ 		c <- []byte("Hi there!")
+	} */
+// 5. Another tough one! Is there any issue with the following code? The syntax of this program is OK, but the program will never exit because it will wait for something to receive the value we're passing
+//    into the channel. e.g., fatal error: all goroutines are asleep - deadlock!
+/* 	package main
+
+	func main() {
+     	c := make(chan string)
+     	c <- "Hi there!"
+	} */
+// 6. Ignoring whether or not the program will exit correctly, are the following two code snippets equivalent? They are the same
+/* Snippet 1
+package main
+
+import "fmt"
+
+func main() {
+ c := make(chan string)
+ for i := 0; i < 4; i++ {
+     go printString("Hello there!", c)
+ }
+
+ for s := range c {
+     fmt.Println(s)
+ }
+}
+
+func printString(s string, c chan string) {
+ fmt.Println(s)
+ c <- "Done printing."
+} */
+/* Snippet 2
+package main
+
+import "fmt"
+
+func main() {
+ c := make(chan string)
+
+ for i := 0; i < 4; i++ {
+     go printString("Hello there!", c)
+ }
+
+ for {
+     fmt.Println(<- c)
+ }
+}
+
+func printString(s string, c chan string) {
+ fmt.Println(s)
+ c <- "Done printing."
+} */
