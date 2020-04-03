@@ -20,8 +20,8 @@ func main() {
 		go checkLink(link, c)
 	}
 
-	for i := 0; i < len(links); i++ {
-		fmt.Println(<-c)
+	for { // infinite loop
+		go checkLink(<-c, c)
 	}
 
 	// fmt.Println(<-c) // If we put one extra, our program will hang because the main routine would be sitting there waiting for someone to send some information into our channel
@@ -31,12 +31,12 @@ func checkLink(link string, c chan string) {
 	_, err := http.Get(link) // Blocking call. When this runs, Main Go routine can do nothing else!
 	if err != nil {
 		fmt.Println(link, "might be down!")
-		c <- "Might be down, I think"
+		c <- link
 		return
 	}
 
 	fmt.Println(link, "is up!")
-	c <- "Yep, it's up"
+	c <- link
 }
 
 // Notes:
