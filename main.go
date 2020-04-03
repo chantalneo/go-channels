@@ -20,8 +20,12 @@ func main() {
 		go checkLink(link, c)
 	}
 
-	for { // infinite loop
-		go checkLink(<-c, c)
+	// for { // infinite loop
+	// 	go checkLink(<-c, c)
+	// }
+
+	for l := range c { // Alternative syntax of the above. It waits for the channel to return some value to assign to l, then run the body of the for loop. Providing more clarity to other engineers
+		go checkLink(l, c)
 	}
 
 	// fmt.Println(<-c) // If we put one extra, our program will hang because the main routine would be sitting there waiting for someone to send some information into our channel
