@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 )
 
 func main() {
@@ -25,7 +26,10 @@ func main() {
 	// }
 
 	for l := range c { // Alternative syntax of the above. It waits for the channel to return some value to assign to l, then run the body of the for loop. Providing more clarity to other engineers
-		go checkLink(l, c)
+		go func() {
+			time.Sleep(5 * time.Second)
+			checkLink(l, c)
+		}()
 	}
 
 	// fmt.Println(<-c) // If we put one extra, our program will hang because the main routine would be sitting there waiting for someone to send some information into our channel
@@ -168,7 +172,7 @@ func checkLink(link string, c chan string) {
 //            V
 //       Go Routine
 //
-// 8. Sending Data with Channels (the syntax)
+// 9. Sending Data with Channels (the syntax)
 //    channel <- 5                  - Send the value '5' into this channel
 //    myNumber <- channel           - Wait for a value to be sent into the channel. When we get one, assign the value to 'myNumber'
 //    fmt.Println(<- channel)       - Wait for a value to be sent into the channel. When we get one, log it out immediately
@@ -176,3 +180,11 @@ func checkLink(link string, c chan string) {
 //    This is how we send data through channels. Remember that our channel is kind of like a two way messaging device we can think of it as being like text messaging
 //    So there's always going to be one person who is sending a message and then another person or another entity, i.e. our program who is receiving that message
 //    For us, we might want to send data from the main routine to all of our child go routines or we might want to send data from our routine and receive it over inside of the main routine
+//
+// 10. Function Literals
+//     JavaScript - Anonymous Function
+//     Ruby - Lambda
+//     Python - Lambda
+//     C# - Lambda
+//     PHP - Anonymous Function
+//     Go - Function Literal
