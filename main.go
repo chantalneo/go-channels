@@ -26,10 +26,10 @@ func main() {
 	// }
 
 	for l := range c { // Alternative syntax of the above. It waits for the channel to return some value to assign to l, then run the body of the for loop. Providing more clarity to other engineers
-		go func() {
+		go func(link string) {
 			time.Sleep(5 * time.Second)
-			checkLink(l, c)
-		}()
+			checkLink(link, c)
+		}(l)
 	}
 
 	// fmt.Println(<-c) // If we put one extra, our program will hang because the main routine would be sitting there waiting for someone to send some information into our channel
@@ -188,3 +188,18 @@ func checkLink(link string, c chan string) {
 //     C# - Lambda
 //     PHP - Anonymous Function
 //     Go - Function Literal
+//
+// 11. With the last commit, I could see that only http://amazon.com is up! was printing towards the end of my program...
+//     Simplified Version to Illustrate Channels Gotcha
+//          RAM
+//     0000  | amazon.com <------  Main Routine has a variable l that is pointing at some location inside of memory that holds
+//     0001  |                |
+//     0002  |                L    Child Routine also pointing at the exact same memory address
+//
+//     So tte warning message that we've seen right there was essentially saying hey you are referencing a variable declared in the outer scope of this function literal (which is constantly changing)
+//     and that's a big deal because we are trying to reference a variable that is being maintained or used by another go routine.
+//     So in practice we never ever attempt to reference the same variable inside of two different routines. So we need to pass by value, we add argument to our function literal.
+//     With that updated, now l can change as much as it pleases and we don't have to worry about still having our routine referencing that same copy or same address in memory.
+//
+//     Remember the big takeaway with routines that we just learned right here is that we should never ever try to access the same variable from a different child routine where ever possible.
+//     We only share information with a child routine or a new routine that we create by passing it in as an argument or communicating with the child routine over channels.
