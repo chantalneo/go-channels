@@ -14,19 +14,25 @@ func main() {
 		"http://amazon.com",
 	}
 
+	c := make(chan string)
+
 	for _, link := range links {
-		go checkLink(link)
+		go checkLink(link, c)
 	}
+
+	fmt.Println(<-c)
 }
 
-func checkLink(link string) {
+func checkLink(link string, c chan string) {
 	_, err := http.Get(link) // Blocking call. When this runs, Main Go routine can do nothing else!
 	if err != nil {
 		fmt.Println(link, "might be down!")
+		c <- "Might be down, I think"
 		return
 	}
 
 	fmt.Println(link, "is up!")
+	c <- "Yep, it's up"
 }
 
 // Notes:
@@ -153,3 +159,12 @@ func checkLink(link string) {
 //            |   "asdf"
 //            V
 //       Go Routine
+//
+// 8. Sending Data with Channels (the syntax)
+//    channel <- 5                  - Send the value '5' into this channel
+//    myNumber <- channel           - Wait for a value to be sent into the channel. When we get one, assign the value to 'myNumber'
+//    fmt.Println(<- channel)       - Wait for a value to be sent into the channel. When we get one, log it out immediately
+//
+//    This is how we send data through channels. Remember that our channel is kind of like a two way messaging device we can think of it as being like text messaging
+//    So there's always going to be one person who is sending a message and then another person or another entity, i.e. our program who is receiving that message
+//    For us, we might want to send data from the main routine to all of our child go routines or we might want to send data from our routine and receive it over inside of the main routine
